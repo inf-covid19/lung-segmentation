@@ -11,73 +11,144 @@ import png
 from skimage.segmentation import clear_border, mark_boundaries
 import glob
 import os
+import argparse
 
-FOLDER = 'lung-data/LE4LKLM2/*'
-RESULT_FOLDER = 'lung-data/LE4LKLM2-segmented/'
-
-try:
-    os.makedirs(RESULT_FOLDER)
-except Exception as e:
-    pass
+S_FOLDER = 'segmented'
+O_FOLDER = 'overlapped'
+M_FOLDER = 'masks'
+I_FOLDER = 'images'
 
 
-def get_result_filename(filename):
+def get_result_filename(dest_folder, filename):
     image_name = filename.split('/')[-1]
-    return RESULT_FOLDER + image_name
+    return '{}/{}'.format(dest_folder.rstrip('/'), image_name)
 
 
-files = glob.glob(FOLDER)
+def create_output_folders(args):
+    output_folder = args.output.rstrip('/')
 
-time_start = time.ctime()
-
-for index, filename in enumerate(files):
-    print('Processing {}/{} {}'.format(index + 1, len(files), filename))
-    # Saving pydicom png file
-    dataset = pydicom.dcmread(filename)
-
-    ds_shape = dataset.pixel_array.shape
-    ds_2d = dataset.pixel_array.astype(float)
-    ds_2d_scaled = np.uint8((np.maximum(ds_2d, 0) / ds_2d.max()) * 255.0)
-
-    # with open('{}-pydicom.png'.format(get_result_filename(filename)), 'wb') as png_file:
-    #     w = png.Writer(ds_shape[1], ds_shape[0], greyscale=True)
-    #     w.write(png_file, ds_2d_scaled)
-
-    # Saving segmentation mask
-    input_image = sitk.ReadImage(filename)
-    segmentation = mask.apply(input_image)[0]
-
-    shape = segmentation.shape
-    mask_scaled = np.uint8(np.maximum(segmentation, 0) /
-                           segmentation.max() * 255.0)
-    mask_scaled = np.uint8(np.where(mask_scaled > 0, 255, 0))
-
-    # with open('{}-mask.png'.format(get_result_filename(filename)), 'wb') as png_file:
-    #     w = png.Writer(shape[1], shape[0], greyscale=True)
-    #     w.write(png_file, mask_scaled)
-
-    image_superimposed = ds_2d_scaled
-    image_superimposed[mask_scaled == 0] = 0
-
-    # with open('{}-superimposed.png'.format(get_result_filename(filename)), 'wb') as png_file:
-    #     w = png.Writer(shape[1], shape[0], greyscale=True)
-    #     w.write(png_file, image_superimposed)
-    def make_mb_image(i_img, i_gt, ds_op=lambda x: x[::1, ::1]):
-        n_img = (i_img-i_img.mean())/(2*i_img.std())+0.5
-        c_img = plt.cm.bone(n_img)[:, :, :3]
-        c_img = mark_boundaries(c_img, label_img=ds_op(
-            i_gt), color=(0, 1, 0), mode='thick')
-        return c_img
-
-    plt.imshow(make_mb_image(ds_2d, mask_scaled))
-    plt.gca().set_axis_off()
-    plt.subplots_adjust(top=1, bottom=0, right=1, left=0,
-                        hspace=0, wspace=0)
-    plt.margins(0, 0)
-    plt.savefig('{}-segmented.png'.format(get_result_filename(filename)),
-                transparent=True, bbox_inches='tight', pad_inches=0)
-    plt.cla()
+    for child_folder, can_create in [('', True),
+                                     (S_FOLDER, True),
+                                     (O_FOLDER, args.overlap),
+                                     (I_FOLDER, args.images),
+                                     (M_FOLDER, args.mask)]:
+        if can_create:
+            try:
+                os.makedirs('{}/{}'.format(output_folder, child_folder))
+            except Exception as e:
+                pass
+    return output_folder
 
 
-print('Process started at:', time_start)
-print('Process endend at:', time.ctime())
+def main():
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('input', metavar='input',
+                        help='filepath for input folder')
+    parser.add_argument('output', metavar='output',
+                        help='filepath for output folder')
+    parser.add_argument('--save-overlap', dest='overlap',
+                        action='store_true', help='save folder with overlapped images')
+    parser.add_argument('--save-mask', dest='mask',
+                        action='store_true', help="save folder with mask images")
+    parser.add_argument('--save-images', dest='images',
+                        action='store_true', help="save folder with converted png images")
+    parser.add_argument('--color', metavar='color',
+                        help="result segmented color map (gray, bone, cool, copper, flag, hot, jet, pink, prism, spring, summer, winter)")
+    parser.set_defaults(overlap=False, color='bone')
+
+    args = parser.parse_args()
+    input_folder = args.input.rstrip('/')
+    output_folder = create_output_folders(args)
+
+    files = glob.glob('{}/*'.format(input_folder.rstrip('/')))
+
+    time_start = time.ctime()
+
+    for index, file_path in enumerate(files):
+        print('Processing {}/{} {}'.format(index + 1, len(files), file_path))
+
+        file_name = file_path.split('/')[-1]
+
+        dataset = pydicom.dcmread(file_path)
+
+        ds_shape = dataset.pixel_array.shape
+        ds_2d = dataset.pixel_array.astype(float)
+        ds_2d_scaled = np.uint8((np.maximum(ds_2d, 0) / ds_2d.max()) * 255.0)
+
+        if args.images:
+            with open('{}/{}/{}.png'.format(output_folder, I_FOLDER, file_name), 'wb') as png_file:
+                w = png.Writer(ds_shape[1], ds_shape[0], greyscale=True)
+                w.write(png_file, ds_2d_scaled)
+
+        input_image = sitk.ReadImage(file_path)
+        segmentation = mask.apply(input_image)[0]
+
+        shape = segmentation.shape
+
+        mask_scaled = np.uint8(np.maximum(segmentation, 0) /
+                               segmentation.max() * 255.0)
+        mask_scaled = np.uint8(np.where(mask_scaled > 0, 255, 0))
+
+        if args.mask:
+
+            with open('{}/{}/{}.png'.format(output_folder, M_FOLDER, file_name), 'wb') as png_file:
+                w = png.Writer(shape[1], shape[0], greyscale=True)
+                w.write(png_file, mask_scaled)
+
+        if args.overlap:
+            image_superimposed = ds_2d_scaled
+            image_superimposed[mask_scaled == 0] = 0
+
+            with open('{}/{}/{}.png'.format(output_folder, O_FOLDER, file_name), 'wb') as png_file:
+                w = png.Writer(shape[1], shape[0], greyscale=True)
+                w.write(png_file, image_superimposed)
+
+        def make_mb_image(i_img, i_gt, ds_op=lambda x: x[::1, ::1]):
+            n_img = (i_img-i_img.mean())/(2*i_img.std())+0.5
+
+            if args.color == 'gray':
+                c_img = plt.cm.gray(n_img)[:, :, :3]
+            elif args.color == 'cool':
+                c_img = plt.cm.cool(n_img)[:, :, :3]
+            elif args.color == 'copper':
+                c_img = plt.cm.copper(n_img)[:, :, :3]
+            elif args.color == 'flag':
+                c_img = plt.cm.flag(n_img)[:, :, :3]
+            elif args.color == 'hot':
+                c_img = plt.cm.hot(n_img)[:, :, :3]
+            elif args.color == 'jet':
+                c_img = plt.cm.jet(n_img)[:, :, :3]
+            elif args.color == 'pink':
+                c_img = plt.cm.pink(n_img)[:, :, :3]
+            elif args.color == 'prism':
+                c_img = plt.cm.prism(n_img)[:, :, :3]
+            elif args.color == 'spring':
+                c_img = plt.cm.spring(n_img)[:, :, :3]
+            elif args.color == 'summer':
+                c_img = plt.cm.summer(n_img)[:, :, :3]
+            elif args.color == 'winter':
+                c_img = plt.cm.winter(n_img)[:, :, :3]
+            else:
+                c_img = plt.cm.bone(n_img)[:, :, :3]
+
+            c_img = mark_boundaries(c_img, label_img=ds_op(
+                i_gt), color=(0, 1, 0), mode='thick')
+            return c_img
+
+        plt.imshow(make_mb_image(ds_2d, mask_scaled))
+        plt.gca().set_axis_off()
+        plt.subplots_adjust(top=1, bottom=0, right=1, left=0,
+                            hspace=0, wspace=0)
+        plt.margins(0, 0)
+        plt.savefig('{}/{}/{}.png'.format(output_folder, S_FOLDER, file_name),
+                    transparent=True, bbox_inches='tight', pad_inches=0)
+        plt.cla()
+
+    print('Process started at:', time_start)
+    print('Process finished at:', time.ctime())
+
+
+if __name__ == "__main__":
+    main()
