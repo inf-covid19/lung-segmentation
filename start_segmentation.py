@@ -62,23 +62,25 @@ def main():
     input_folder = args.input.rstrip('/')
     output_folder = create_output_folders(args)
 
-    files = glob.glob('{}/*'.format(input_folder.rstrip('/')))
+    files = sorted(glob.glob('{}/*'.format(input_folder.rstrip('/'))))
 
     time_start = time.ctime()
 
     for index, file_path in enumerate(files):
         print('Processing {}/{} {}'.format(index + 1, len(files), file_path))
 
-        file_name = file_path.split('/')[-1]
-
         dataset = pydicom.dcmread(file_path)
+
+        acquisition_time = dataset.get('AcquisitionTime', index + 1)
+        new_filename = '{}_{}'.format(
+            acquisition_time,  file_path.split('/')[-1])
 
         ds_shape = dataset.pixel_array.shape
         ds_2d = dataset.pixel_array.astype(float)
         ds_2d_scaled = np.uint8((np.maximum(ds_2d, 0) / ds_2d.max()) * 255.0)
 
         if args.images:
-            with open('{}/{}/{}.png'.format(output_folder, I_FOLDER, file_name), 'wb') as png_file:
+            with open('{}/{}/{}.png'.format(output_folder, I_FOLDER, new_filename), 'wb') as png_file:
                 w = png.Writer(ds_shape[1], ds_shape[0], greyscale=True)
                 w.write(png_file, ds_2d_scaled)
 
@@ -93,7 +95,7 @@ def main():
 
         if args.mask:
 
-            with open('{}/{}/{}.png'.format(output_folder, M_FOLDER, file_name), 'wb') as png_file:
+            with open('{}/{}/{}.png'.format(output_folder, M_FOLDER, new_filename), 'wb') as png_file:
                 w = png.Writer(shape[1], shape[0], greyscale=True)
                 w.write(png_file, mask_scaled)
 
@@ -101,7 +103,7 @@ def main():
             image_superimposed = ds_2d_scaled
             image_superimposed[mask_scaled == 0] = 0
 
-            with open('{}/{}/{}.png'.format(output_folder, O_FOLDER, file_name), 'wb') as png_file:
+            with open('{}/{}/{}.png'.format(output_folder, O_FOLDER, new_filename), 'wb') as png_file:
                 w = png.Writer(shape[1], shape[0], greyscale=True)
                 w.write(png_file, image_superimposed)
 
@@ -142,7 +144,7 @@ def main():
         plt.subplots_adjust(top=1, bottom=0, right=1, left=0,
                             hspace=0, wspace=0)
         plt.margins(0, 0)
-        plt.savefig('{}/{}/{}.png'.format(output_folder, S_FOLDER, file_name),
+        plt.savefig('{}/{}/{}.png'.format(output_folder, S_FOLDER, new_filename),
                     transparent=True, bbox_inches='tight', pad_inches=0)
         plt.cla()
 
