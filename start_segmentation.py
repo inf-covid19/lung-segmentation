@@ -69,84 +69,89 @@ def main():
     for index, file_path in enumerate(files):
         print('Processing {}/{} {}'.format(index + 1, len(files), file_path))
 
-        dataset = pydicom.dcmread(file_path)
+        try:
+            dataset = pydicom.dcmread(file_path)
 
-        acquisition_time = dataset.get('AcquisitionTime', index + 1)
-        new_filename = '{}_{}'.format(
-            acquisition_time,  file_path.split('/')[-1])
+            acquisition_time = dataset.get('AcquisitionTime', index + 1)
+            new_filename = '{}_{}'.format(
+                acquisition_time,  file_path.split('/')[-1])
 
-        ds_shape = dataset.pixel_array.shape
-        ds_2d = dataset.pixel_array.astype(float)
-        ds_2d_scaled = np.uint8((np.maximum(ds_2d, 0) / ds_2d.max()) * 255.0)
+            ds_shape = dataset.pixel_array.shape
+            ds_2d = dataset.pixel_array.astype(float)
+            ds_2d_scaled = np.uint8(
+                (np.maximum(ds_2d, 0) / ds_2d.max()) * 255.0)
 
-        if args.images:
-            with open('{}/{}/{}.png'.format(output_folder, I_FOLDER, new_filename), 'wb') as png_file:
-                w = png.Writer(ds_shape[1], ds_shape[0], greyscale=True)
-                w.write(png_file, ds_2d_scaled)
+            if args.images:
+                with open('{}/{}/{}.png'.format(output_folder, I_FOLDER, new_filename), 'wb') as png_file:
+                    w = png.Writer(ds_shape[1], ds_shape[0], greyscale=True)
+                    w.write(png_file, ds_2d_scaled)
 
-        input_image = sitk.ReadImage(file_path)
-        segmentation = mask.apply(input_image)[0]
+            input_image = sitk.ReadImage(file_path)
+            segmentation = mask.apply(input_image)[0]
 
-        shape = segmentation.shape
+            shape = segmentation.shape
 
-        mask_scaled = np.uint8(np.maximum(segmentation, 0) /
-                               segmentation.max() * 255.0)
-        mask_scaled = np.uint8(np.where(mask_scaled > 0, 255, 0))
+            mask_scaled = np.uint8(np.maximum(segmentation, 0) /
+                                   segmentation.max() * 255.0)
+            mask_scaled = np.uint8(np.where(mask_scaled > 0, 255, 0))
 
-        if args.mask:
+            if args.mask:
 
-            with open('{}/{}/{}.png'.format(output_folder, M_FOLDER, new_filename), 'wb') as png_file:
-                w = png.Writer(shape[1], shape[0], greyscale=True)
-                w.write(png_file, mask_scaled)
+                with open('{}/{}/{}.png'.format(output_folder, M_FOLDER, new_filename), 'wb') as png_file:
+                    w = png.Writer(shape[1], shape[0], greyscale=True)
+                    w.write(png_file, mask_scaled)
 
-        if args.overlap:
-            image_superimposed = ds_2d_scaled
-            image_superimposed[mask_scaled == 0] = 0
+            if args.overlap:
+                image_superimposed = ds_2d_scaled
+                image_superimposed[mask_scaled == 0] = 0
 
-            with open('{}/{}/{}.png'.format(output_folder, O_FOLDER, new_filename), 'wb') as png_file:
-                w = png.Writer(shape[1], shape[0], greyscale=True)
-                w.write(png_file, image_superimposed)
+                with open('{}/{}/{}.png'.format(output_folder, O_FOLDER, new_filename), 'wb') as png_file:
+                    w = png.Writer(shape[1], shape[0], greyscale=True)
+                    w.write(png_file, image_superimposed)
 
-        def make_mb_image(i_img, i_gt, ds_op=lambda x: x[::1, ::1]):
-            n_img = (i_img-i_img.mean())/(2*i_img.std())+0.5
+            def make_mb_image(i_img, i_gt, ds_op=lambda x: x[::1, ::1]):
+                n_img = (i_img-i_img.mean())/(2*i_img.std())+0.5
 
-            if args.color == 'gray':
-                c_img = plt.cm.gray(n_img)[:, :, :3]
-            elif args.color == 'cool':
-                c_img = plt.cm.cool(n_img)[:, :, :3]
-            elif args.color == 'copper':
-                c_img = plt.cm.copper(n_img)[:, :, :3]
-            elif args.color == 'flag':
-                c_img = plt.cm.flag(n_img)[:, :, :3]
-            elif args.color == 'hot':
-                c_img = plt.cm.hot(n_img)[:, :, :3]
-            elif args.color == 'jet':
-                c_img = plt.cm.jet(n_img)[:, :, :3]
-            elif args.color == 'pink':
-                c_img = plt.cm.pink(n_img)[:, :, :3]
-            elif args.color == 'prism':
-                c_img = plt.cm.prism(n_img)[:, :, :3]
-            elif args.color == 'spring':
-                c_img = plt.cm.spring(n_img)[:, :, :3]
-            elif args.color == 'summer':
-                c_img = plt.cm.summer(n_img)[:, :, :3]
-            elif args.color == 'winter':
-                c_img = plt.cm.winter(n_img)[:, :, :3]
-            else:
-                c_img = plt.cm.bone(n_img)[:, :, :3]
+                if args.color == 'gray':
+                    c_img = plt.cm.gray(n_img)[:, :, :3]
+                elif args.color == 'cool':
+                    c_img = plt.cm.cool(n_img)[:, :, :3]
+                elif args.color == 'copper':
+                    c_img = plt.cm.copper(n_img)[:, :, :3]
+                elif args.color == 'flag':
+                    c_img = plt.cm.flag(n_img)[:, :, :3]
+                elif args.color == 'hot':
+                    c_img = plt.cm.hot(n_img)[:, :, :3]
+                elif args.color == 'jet':
+                    c_img = plt.cm.jet(n_img)[:, :, :3]
+                elif args.color == 'pink':
+                    c_img = plt.cm.pink(n_img)[:, :, :3]
+                elif args.color == 'prism':
+                    c_img = plt.cm.prism(n_img)[:, :, :3]
+                elif args.color == 'spring':
+                    c_img = plt.cm.spring(n_img)[:, :, :3]
+                elif args.color == 'summer':
+                    c_img = plt.cm.summer(n_img)[:, :, :3]
+                elif args.color == 'winter':
+                    c_img = plt.cm.winter(n_img)[:, :, :3]
+                else:
+                    c_img = plt.cm.bone(n_img)[:, :, :3]
 
-            c_img = mark_boundaries(c_img, label_img=ds_op(
-                i_gt), color=(0, 1, 0), mode='thick')
-            return c_img
+                c_img = mark_boundaries(c_img, label_img=ds_op(
+                    i_gt), color=(0, 1, 0), mode='thick')
+                return c_img
 
-        plt.imshow(make_mb_image(ds_2d, mask_scaled))
-        plt.gca().set_axis_off()
-        plt.subplots_adjust(top=1, bottom=0, right=1, left=0,
-                            hspace=0, wspace=0)
-        plt.margins(0, 0)
-        plt.savefig('{}/{}/{}.png'.format(output_folder, S_FOLDER, new_filename),
-                    transparent=True, bbox_inches='tight', pad_inches=0)
-        plt.cla()
+            plt.imshow(make_mb_image(ds_2d, mask_scaled))
+            plt.gca().set_axis_off()
+            plt.subplots_adjust(top=1, bottom=0, right=1, left=0,
+                                hspace=0, wspace=0)
+            plt.margins(0, 0)
+            plt.savefig('{}/{}/{}.png'.format(output_folder, S_FOLDER, new_filename),
+                        transparent=True, bbox_inches='tight', pad_inches=0)
+            plt.cla()
+        except Exception as e:
+            print('Error while processing "{}":'.format(file_path))
+            print(e)
 
     print('Process started at:', time_start)
     print('Process finished at:', time.ctime())
