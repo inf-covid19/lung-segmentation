@@ -56,9 +56,12 @@ def main():
                         action='store_true', help="save folder with converted png images")
     parser.add_argument('--color', metavar='color',
                         help="result segmented color map (gray, bone, cool, copper, flag, hot, jet, pink, prism, spring, summer, winter)")
+    parser.add_argument('--model', metavar='model',
+                        help="model used to segment image (R231, LTRCLobes, LTRCLobes_R231, R231CovidWeb)")
     parser.set_defaults(overlap=False, color='bone')
 
     args = parser.parse_args()
+
     input_folder = args.input.rstrip('/')
     output_folder = create_output_folders(args)
 
@@ -87,16 +90,23 @@ def main():
                     w.write(png_file, ds_2d_scaled)
 
             input_image = sitk.ReadImage(file_path)
-            segmentation = mask.apply(input_image)[0]
+
+            if args.model:
+                if args.model == 'LTRCLobes_R231':
+                    segmentation = mask.apply_fused(input_image)[0]
+                else:
+                    model = mask.get_model('unet', args.model)
+                    segmentation = mask.apply(input_image, model)[0]
+            else:
+                segmentation = mask.apply(input_image)[0]
 
             shape = segmentation.shape
 
             mask_scaled = np.uint8(np.maximum(segmentation, 0) /
                                    segmentation.max() * 255.0)
-            mask_scaled = np.uint8(np.where(mask_scaled > 0, 255, 0))
+            # mask_scaled = np.uint8(np.where(mask_scaled > 0, 255, 0))
 
             if args.mask:
-
                 with open('{}/{}/{}.png'.format(output_folder, M_FOLDER, new_filename), 'wb') as png_file:
                     w = png.Writer(shape[1], shape[0], greyscale=True)
                     w.write(png_file, mask_scaled)
