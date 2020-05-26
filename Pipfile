@@ -13,6 +13,7 @@ torchvision = "==0.6.0"
 lungmask = {git = "https://github.com/JoHof/lungmask"}
 pypng = "*"
 imageio = "*"
+scikit-learn = "*"
 
 [requires]
 python_version = "3.7"
