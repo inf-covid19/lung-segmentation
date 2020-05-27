@@ -23,6 +23,14 @@ O_FOLDER = 'overlapped'
 M_FOLDER = 'masks'
 I_FOLDER = 'images'
 
+COLORS = [
+    (0, 1, 0),
+    (1, 0, 0),
+    (0, 0, 1),
+    (0, 1, 1),
+    (1, 0, 1),
+]
+
 
 def get_result_filename(dest_folder, filename):
     image_name = filename.split('/')[-1]
@@ -42,6 +50,8 @@ def create_output_folders(args):
                 if can_create:
                     os.makedirs('{}/{}/{}'.format(output_folder,
                                                   i+1, child_folder), exist_ok=True)
+            os.makedirs('{}/all/segmented/'.format(output_folder),
+                        exist_ok=True)
     for child_folder, can_create in [('', True),
                                      (S_FOLDER, True),
                                      (O_FOLDER, args.overlap),
@@ -94,7 +104,7 @@ def get_model_segmentation(args, file_path):
         #     masks.append(i)
         # shape = masks[0].shape
 
-        # colors = [
+        # COLORS = [
         #     (0, 1, 0),
         #     (1, 0, 0),
         #     (0, 0, 1),
@@ -135,7 +145,7 @@ def get_model_segmentation(args, file_path):
         #         return c_img
 
         #     plt.imshow(make_mb_image(
-        #         ds_2d_scaled, mask_scaled, color=colors[count]))
+        #         ds_2d_scaled, mask_scaled, color=COLORS[count]))
         #     # mask_color = mask_scaled
         #     # mask_color[mask_scaled == 255] = [0,0,255]
         #     # plt.imshow(mask_scaled, alpha=0.4)
@@ -154,7 +164,7 @@ def get_model_segmentation(args, file_path):
 
         #     for index, mask in enumerate(masks):
         #         c_img = mark_boundaries(c_img, label_img=ds_op(
-        #             mask), color=colors[index], mode='thick')
+        #             mask), color=COLORS[index], mode='thick')
         #     return c_img
 
         # plt.imshow(make_fill_image(ds_2d_scaled, masks_correct))
@@ -167,7 +177,7 @@ def get_model_segmentation(args, file_path):
         # plt.cla()
 
 
-def make_mb_image(args, i_img, i_gt, color=(0, 1, 0), ds_op=lambda x: x[::1, ::1]):
+def make_mb_image(args, i_img, i_gt, masks=[], color=(0, 1, 0), ds_op=lambda x: x[::1, ::1]):
     n_img = (i_img-i_img.mean())/(2*i_img.std())+0.5
 
     if args.color == 'gray':
@@ -195,8 +205,13 @@ def make_mb_image(args, i_img, i_gt, color=(0, 1, 0), ds_op=lambda x: x[::1, ::1
     else:
         c_img = plt.cm.bone(n_img)[:, :, :3]
 
-    c_img = mark_boundaries(c_img, label_img=ds_op(
-        i_gt), color=color, mode='thick')
+    if masks:
+        for i, mask in enumerate(masks):
+            c_img = mark_boundaries(c_img, label_img=ds_op(
+                mask), color=COLORS[i], mode='thick')
+    else:
+        c_img = mark_boundaries(c_img, label_img=ds_op(
+            i_gt), color=color, mode='thick')
     return c_img
 
 
@@ -262,14 +277,6 @@ def main():
             else:
                 segmentations = mask.apply(input_image)
 
-            colors = [
-                (0, 1, 0),
-                (1, 0, 0),
-                (0, 0, 1),
-                (0, 1, 1),
-                (1, 0, 1),
-            ]
-
             for s_i, segmentation in enumerate(segmentations):
                 try:
                     shape = segmentation.shape
@@ -292,7 +299,7 @@ def main():
                             w.write(png_file, image_superimposed)
 
                     plt.imshow(make_mb_image(
-                        args, ds_2d, mask_scaled, color=colors[s_i]))
+                        args, ds_2d, mask_scaled, color=COLORS[s_i]))
                     plt.gca().set_axis_off()
                     plt.subplots_adjust(top=1, bottom=0, right=1, left=0,
                                         hspace=0, wspace=0)
@@ -303,6 +310,25 @@ def main():
                 except Exception as e:
                     print('Error in segmentation "{}":'.format(s_i+1))
                     print(e)
+            if len(segmentations) > 1:
+                masks = []
+                for s_i, segmentation in enumerate(segmentations):
+                    shape = segmentation.shape
+
+                    mask_scaled = np.uint8(np.maximum(segmentation, 0) /
+                                           segmentation.max() * 255.0)
+                    mask_scaled = np.uint8(np.where(mask_scaled > 0, 255, 0))
+                    masks.append(mask_scaled)
+                plt.imshow(make_mb_image(
+                    args, ds_2d, mask_scaled, masks=masks, color=COLORS[s_i]))
+                plt.gca().set_axis_off()
+                plt.subplots_adjust(top=1, bottom=0, right=1, left=0,
+                                    hspace=0, wspace=0)
+                plt.margins(0, 0)
+                plt.savefig('{}/{}/{}/{}.png'.format(output_folder, 'all',  S_FOLDER, new_filename),
+                            transparent=True, bbox_inches='tight', pad_inches=0)
+                plt.cla()
+
         except Exception as e:
             print('Error while processing "{}":'.format(file_path))
             print(e)
