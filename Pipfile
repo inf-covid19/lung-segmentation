@@ -13,6 +13,9 @@ torchvision = "==0.6.0"
 lungmask = {git = "https://github.com/JoHof/lungmask"}
 pypng = "*"
 imageio = "*"
+scikit-learn = "*"
+tensorflow = "==1.13.1"
+keras = "==2.2.4"
 
 [requires]
 python_version = "3.7"
