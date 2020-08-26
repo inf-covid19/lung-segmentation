@@ -1,0 +1,429 @@
+(ricco) rsoares@cidia:/ssd/share/Classificacao/Abordagem2D-Comba$ python load_and_test_2.py
+included patients from annotated excel file:  53
+
+Found 4 HMV Typical (negative pcr) patients
+Found 2 HMV Negative (positive pcr) patients
+Found 7 HMV Indetermined (positive pcr) patients
+Found 23 HMV Indetermined (negative pcr) patients
+Found 17 HMV Atypical patients
+2020-08-26 00:46:03.526148: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcuda.so.1
+2020-08-26 00:46:03.642215: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 0 with properties: 
+pciBusID: 0000:af:00.0 name: GeForce RTX 2080 Ti computeCapability: 7.5
+coreClock: 1.545GHz coreCount: 68 deviceMemorySize: 10.76GiB deviceMemoryBandwidth: 573.69GiB/s
+2020-08-26 00:46:03.644654: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 1 with properties: 
+pciBusID: 0000:d8:00.0 name: GeForce RTX 2080 Ti computeCapability: 7.5
+coreClock: 1.545GHz coreCount: 68 deviceMemorySize: 10.76GiB deviceMemoryBandwidth: 573.69GiB/s
+2020-08-26 00:46:03.653116: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudart.so.10.1
+2020-08-26 00:46:03.659198: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcublas.so.10
+2020-08-26 00:46:03.663916: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcufft.so.10
+2020-08-26 00:46:03.665384: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcurand.so.10
+2020-08-26 00:46:03.670860: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusolver.so.10
+2020-08-26 00:46:03.674376: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusparse.so.10
+2020-08-26 00:46:03.697360: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudnn.so.7
+2020-08-26 00:46:03.706674: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1703] Adding visible gpu devices: 0, 1
+2020-08-26 00:46:03.707338: I tensorflow/core/platform/cpu_feature_guard.cc:143] Your CPU supports instructions that this TensorFlow binary was not compiled to use: SSE4.1 SSE4.2 AVX AVX2 AVX512F FMA
+2020-08-26 00:46:03.745131: I tensorflow/core/platform/profile_utils/cpu_utils.cc:102] CPU Frequency: 2100000000 Hz
+2020-08-26 00:46:03.745630: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x556834cac480 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+2020-08-26 00:46:03.745683: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+2020-08-26 00:46:04.158186: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 0 with properties: 
+pciBusID: 0000:af:00.0 name: GeForce RTX 2080 Ti computeCapability: 7.5
+coreClock: 1.545GHz coreCount: 68 deviceMemorySize: 10.76GiB deviceMemoryBandwidth: 573.69GiB/s
+2020-08-26 00:46:04.160600: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 1 with properties: 
+pciBusID: 0000:d8:00.0 name: GeForce RTX 2080 Ti computeCapability: 7.5
+coreClock: 1.545GHz coreCount: 68 deviceMemorySize: 10.76GiB deviceMemoryBandwidth: 573.69GiB/s
+2020-08-26 00:46:04.160753: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudart.so.10.1
+2020-08-26 00:46:04.160829: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcublas.so.10
+2020-08-26 00:46:04.160893: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcufft.so.10
+2020-08-26 00:46:04.161001: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcurand.so.10
+2020-08-26 00:46:04.161067: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusolver.so.10
+2020-08-26 00:46:04.161154: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusparse.so.10
+2020-08-26 00:46:04.161229: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudnn.so.7
+2020-08-26 00:46:04.170154: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1703] Adding visible gpu devices: 0, 1
+2020-08-26 00:46:04.170311: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudart.so.10.1
+2020-08-26 00:46:04.177225: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1102] Device interconnect StreamExecutor with strength 1 edge matrix:
+2020-08-26 00:46:04.177266: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1108]      0 1 
+2020-08-26 00:46:04.177282: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1121] 0:   N N 
+2020-08-26 00:46:04.177293: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1121] 1:   N N 
+2020-08-26 00:46:04.186391: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1247] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 10202 MB memory) -> physical GPU (device: 0, name: GeForce RTX 2080 Ti, pci bus id: 0000:af:00.0, compute capability: 7.5)
+2020-08-26 00:46:04.192318: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1247] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:1 with 10202 MB memory) -> physical GPU (device: 1, name: GeForce RTX 2080 Ti, pci bus id: 0000:d8:00.0, compute capability: 7.5)
+2020-08-26 00:46:04.197919: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x5568387daa50 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:
+2020-08-26 00:46:04.197968: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): GeForce RTX 2080 Ti, Compute Capability 7.5
+2020-08-26 00:46:04.197984: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (1): GeForce RTX 2080 Ti, Compute Capability 7.5
+
+Predicting Test Patients
+
+
+Predicting Negative (positive pcr) Patients
+
+Found 100 validated image filenames.
+2020-08-26 00:46:10.648034: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcublas.so.10
+2020-08-26 00:46:11.436598: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudnn.so.7
+Found 100 validated image filenames.
+Patient number:  C76
+loading label legend file
+other    84
+covid    16
+Name: category, dtype: int64
+
+Patient number:  C105
+loading label legend file
+other    64
+covid    36
+Name: category, dtype: int64
+
+
+Predicting Typical (negative pcr) Patients
+
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Patient number:  C71
+loading label legend file
+covid    100
+Name: category, dtype: int64
+
+Patient number:  C101
+loading label legend file
+covid    85
+other    15
+Name: category, dtype: int64
+
+Patient number:  C143
+loading label legend file
+other    61
+covid    39
+Name: category, dtype: int64
+
+Patient number:  C162
+loading label legend file
+covid    100
+Name: category, dtype: int64
+
+
+
+Predicting Indetermined (positive pcr) Patients
+
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Patient number:  C40
+loading label legend file
+covid    74
+other    26
+Name: category, dtype: int64
+
+Patient number:  C48
+loading label legend file
+covid    100
+Name: category, dtype: int64
+
+Patient number:  C57
+loading label legend file
+covid    76
+other    24
+Name: category, dtype: int64
+
+Patient number:  C65
+loading label legend file
+other    92
+covid     8
+Name: category, dtype: int64
+
+Patient number:  C97
+loading label legend file
+covid    100
+Name: category, dtype: int64
+
+Patient number:  C107
+loading label legend file
+covid    53
+other    47
+Name: category, dtype: int64
+
+Patient number:  C128
+loading label legend file
+other    85
+covid    15
+Name: category, dtype: int64
+
+
+Predicting Indetermined (negative pcr) Patients
+
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Patient number:  C28
+loading label legend file
+other    90
+covid    10
+Name: category, dtype: int64
+
+Patient number:  C30
+loading label legend file
+other    97
+covid     3
+Name: category, dtype: int64
+
+Patient number:  C31
+loading label legend file
+other    53
+covid    47
+Name: category, dtype: int64
+
+Patient number:  C34
+loading label legend file
+covid    100
+Name: category, dtype: int64
+
+Patient number:  C37
+loading label legend file
+covid    99
+other     1
+Name: category, dtype: int64
+
+Patient number:  C38
+loading label legend file
+covid    87
+other    13
+Name: category, dtype: int64
+
+Patient number:  C45
+loading label legend file
+covid    94
+other     6
+Name: category, dtype: int64
+
+Patient number:  C47
+loading label legend file
+covid    100
+Name: category, dtype: int64
+
+Patient number:  C54
+loading label legend file
+covid    52
+other    48
+Name: category, dtype: int64
+
+Patient number:  C68
+loading label legend file
+covid    84
+other    16
+Name: category, dtype: int64
+
+Patient number:  C72
+loading label legend file
+covid    99
+other     1
+Name: category, dtype: int64
+
+Patient number:  C84
+loading label legend file
+other    100
+Name: category, dtype: int64
+
+Patient number:  C98
+loading label legend file
+other    72
+covid    28
+Name: category, dtype: int64
+
+Patient number:  C99
+loading label legend file
+covid    93
+other     7
+Name: category, dtype: int64
+
+Patient number:  C109
+loading label legend file
+covid    70
+other    30
+Name: category, dtype: int64
+
+Patient number:  C119
+loading label legend file
+other    76
+covid    24
+Name: category, dtype: int64
+
+Patient number:  C123
+loading label legend file
+covid    100
+Name: category, dtype: int64
+
+Patient number:  C129
+loading label legend file
+covid    53
+other    47
+Name: category, dtype: int64
+
+Patient number:  C139
+loading label legend file
+covid    64
+other    36
+Name: category, dtype: int64
+
+Patient number:  C140
+loading label legend file
+covid    100
+Name: category, dtype: int64
+
+Patient number:  C148
+loading label legend file
+other    94
+covid     6
+Name: category, dtype: int64
+
+Patient number:  C156
+loading label legend file
+covid    100
+Name: category, dtype: int64
+
+Patient number:  C8
+loading label legend file
+covid    85
+other    15
+Name: category, dtype: int64
+
+Predicting Atypical Patients
+
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Patient number:  C43
+loading label legend file
+covid    72
+other    28
+Name: category, dtype: int64
+
+Patient number:  C55
+loading label legend file
+other    66
+covid    34
+Name: category, dtype: int64
+
+Patient number:  C56
+loading label legend file
+other    99
+covid     1
+Name: category, dtype: int64
+
+Patient number:  C58
+loading label legend file
+covid    82
+other    18
+Name: category, dtype: int64
+
+Patient number:  C59
+loading label legend file
+covid    69
+other    31
+Name: category, dtype: int64
+
+Patient number:  C64
+loading label legend file
+covid    95
+other     5
+Name: category, dtype: int64
+
+Patient number:  C67
+loading label legend file
+other    100
+Name: category, dtype: int64
+
+Patient number:  C70
+loading label legend file
+covid    100
+Name: category, dtype: int64
+
+Patient number:  C73
+loading label legend file
+other    100
+Name: category, dtype: int64
+
+Patient number:  C81
+loading label legend file
+other    78
+covid    22
+Name: category, dtype: int64
+
+Patient number:  C9
+loading label legend file
+other    55
+covid    45
+Name: category, dtype: int64
+
+Patient number:  C118
+loading label legend file
+covid    77
+other    23
+Name: category, dtype: int64
+
+Patient number:  C122
+loading label legend file
+covid    52
+other    48
+Name: category, dtype: int64
+
+Patient number:  C127
+loading label legend file
+other    65
+covid    35
+Name: category, dtype: int64
+
+Patient number:  C134
+loading label legend file
+other    99
+covid     1
+Name: category, dtype: int64
+
+Patient number:  C141
+loading label legend file
+other    91
+covid     9
+Name: category, dtype: int64
+
+Patient number:  C164
+loading label legend file
+covid    86
+other    14
+Name: category, dtype: int64
+

@@ -1,0 +1,195 @@
+(ricco) rsoares@cidia:/ssd/share/Classificacao/Abordagem2D-Comba$ tail -f binary_log.txt
+Name: label, dtype: int64
+
+Validation fold with 2400 images
+label
+covid    1700
+other     700
+Name: label, dtype: int64
+------------------------------
+Found 12300 validated image filenames belonging to 2 classes.
+Found 2400 validated image filenames belonging to 2 classes.
+Epoch 1/10
+2020-08-25 10:31:29.276246: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcublas.so.10
+2020-08-25 10:31:29.604515: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudnn.so.7
+1230/1230 [==============================] - 941s 765ms/step - loss: 0.3899 - accuracy: 0.8159 - val_loss: 0.4385 - val_accuracy: 0.7546
+Epoch 2/10
+1230/1230 [==============================] - 933s 758ms/step - loss: 0.1725 - accuracy: 0.9464 - val_loss: 0.3540 - val_accuracy: 0.8683
+Epoch 3/10
+1230/1230 [==============================] - 932s 758ms/step - loss: 0.1544 - accuracy: 0.9547 - val_loss: 0.3198 - val_accuracy: 0.9071
+Epoch 4/10
+1230/1230 [==============================] - 926s 753ms/step - loss: 0.1490 - accuracy: 0.9581 - val_loss: 0.4189 - val_accuracy: 0.9054
+Epoch 5/10
+1230/1230 [==============================] - 929s 755ms/step - loss: 0.1298 - accuracy: 0.9639 - val_loss: 0.3775 - val_accuracy: 0.8796
+Epoch 6/10
+1230/1230 [==============================] - 930s 756ms/step - loss: 0.1295 - accuracy: 0.9688 - val_loss: 0.5378 - val_accuracy: 0.8721
+Epoch 7/10
+1230/1230 [==============================] - 924s 751ms/step - loss: 0.1176 - accuracy: 0.9712 - val_loss: 0.3483 - val_accuracy: 0.9025
+Epoch 8/10
+1230/1230 [==============================] - 925s 752ms/step - loss: 0.1453 - accuracy: 0.9724 - val_loss: 0.5247 - val_accuracy: 0.8963
+Epoch 9/10
+1230/1230 [==============================] - 932s 758ms/step - loss: 0.1667 - accuracy: 0.9731 - val_loss: 0.3777 - val_accuracy: 0.9058
+Epoch 10/10
+1230/1230 [==============================] - 926s 753ms/step - loss: 0.1830 - accuracy: 0.9737 - val_loss: 1.0480 - val_accuracy: 0.8950
+
+Predicting Validation Patients
+
+
+Predicting Typical Patients
+
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Patient number:  C121
+loading label legend file
+covid    100
+Name: category, dtype: int64
+
+Patient number:  TYP-023
+loading label legend file
+covid    100
+Name: category, dtype: int64
+
+Patient number:  TYP-027
+loading label legend file
+covid    73
+other    27
+Name: category, dtype: int64
+
+Patient number:  C149
+loading label legend file
+covid    100
+Name: category, dtype: int64
+
+Patient number:  C116
+loading label legend file
+other    77
+covid    23
+Name: category, dtype: int64
+
+Patient number:  TYP-020
+loading label legend file
+covid    100
+Name: category, dtype: int64
+
+Patient number:  TYP-014
+loading label legend file
+covid    70
+other    30
+Name: category, dtype: int64
+
+Patient number:  C125
+loading label legend file
+covid    100
+Name: category, dtype: int64
+
+Patient number:  C41
+loading label legend file
+covid    100
+Name: category, dtype: int64
+
+Patient number:  C33
+loading label legend file
+covid    100
+Name: category, dtype: int64
+
+Patient number:  C13
+loading label legend file
+covid    100
+Name: category, dtype: int64
+
+Patient number:  C94
+loading label legend file
+covid    100
+Name: category, dtype: int64
+
+Patient number:  C82
+loading label legend file
+other    60
+covid    40
+Name: category, dtype: int64
+
+Patient number:  C138
+loading label legend file
+covid    100
+Name: category, dtype: int64
+
+Patient number:  C132
+loading label legend file
+covid    100
+Name: category, dtype: int64
+
+Patient number:  TYP-011
+loading label legend file
+covid    100
+Name: category, dtype: int64
+
+Patient number:  C75
+loading label legend file
+covid    100
+Name: category, dtype: int64
+
+
+Predicting Negative Patients
+
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Found 100 validated image filenames.
+Patient number:  NEG-011
+loading label legend file
+other    100
+Name: category, dtype: int64
+
+Patient number:  C42
+loading label legend file
+other    93
+covid     7
+Name: category, dtype: int64
+
+Patient number:  C46
+loading label legend file
+other    96
+covid     4
+Name: category, dtype: int64
+
+Patient number:  C92
+loading label legend file
+other    100
+Name: category, dtype: int64
+
+Patient number:  C86
+loading label legend file
+other    93
+covid     7
+Name: category, dtype: int64
+
+Patient number:  NEG-004
+loading label legend file
+other    92
+covid     8
+Name: category, dtype: int64
+
+Patient number:  C5
+loading label legend file
+other    99
+covid     1
+Name: category, dtype: int64
+
