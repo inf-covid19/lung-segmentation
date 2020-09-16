@@ -1,5 +1,8 @@
-import imutils
+import time
+import os
 import argparse
+import json
+import imutils
 from tensorflow.keras.applications import imagenet_utils
 from tensorflow.keras.preprocessing.image import load_img
 from tensorflow.keras.preprocessing.image import img_to_array
@@ -101,84 +104,144 @@ class GradCAM:
         return (heatmap, output)
 
 
-# model_filename = 'cidia-lung-model_1.h5'
-model_filename = 'local-modelhaha.h5'
-slice_filename = '/home/chicobentojr/Desktop/cidia/data/C11/-slice260..png'
-
-if __name__ == "__main__":
+def main(args):
     # import the necessary packages
     # construct the argument parser and parse the arguments
-    ap = argparse.ArgumentParser()
-    ap.add_argument("-i", "--image", required=True,
-                    help="path to the input image")
-    ap.add_argument("-m", "--model", type=str, default="vgg",
-                    # choices=("vgg", "resnet"),
-                    help="model to be used")
-    args = vars(ap.parse_args())
+    # ap = argparse.ArgumentParser()
+    # ap.add_argument("-i", "--image", required=True,
+    #                 help="path to the input image")
+    # ap.add_argument("-m", "--model", type=str, default="vgg",
+    #                 # choices=("vgg", "resnet"),
+    #                 help="model to be used")
+    # args = vars(ap.parse_args())
 
-    args['image'] = slice_filename
+    files = args.input_files
+    output_folder = args.output_folder.rstrip('/')
+    img_size = args.size
+    target_size = (img_size, img_size)
 
-    # initialize the model to be VGG16
-    Model = VGG16
-    # check to see if we are using ResNet
-    if args["model"] == "resnet":
-        Model = ResNet50
-    # load the pre-trained CNN from disk
-    print("[INFO] loading model...")
-    # model = Model(weights="imagenet")
-
-    model_filename = args['model']
+    model_filename = args.model
 
     model = load_model(model_filename)
 
-    print('model summary')
-    model.summary()
+    os.makedirs(output_folder, exist_ok=True)
+
+    if args.linear_activation:
+        model.layers[-1].activation = tf.keras.activations.linear
+
+    for i, filepath in enumerate(files):
+        print(f"Processing {i+1}/{len(files)} => {filepath}")
+        filename = filepath.split('/')[-1]
+        # args['image'] = slice_filename
+
+        # # initialize the model to be VGG16
+        # Model = VGG16
+        # # check to see if we are using ResNet
+        # if args["model"] == "resnet":
+        #     Model = ResNet50
+        # load the pre-trained CNN from disk
+        # print("[INFO] loading model...")
+        # model = Model(weights="imagenet")
+
+        # model_filename = args['model']
+
+        # print('model summary')
+        # model.summary()
+        # print()
+
+        # sss = 300
+
+        # load the original image from disk (in OpenCV format) and then
+        # resize the image to its target dimensions
+        # orig = cv2.imread(args["image"])
+        orig = cv2.imread(filepath)
+        resized = cv2.resize(orig, target_size)
+        # load the input image from disk (in Keras/TensorFlow format) and
+        # preprocess it
+        image = load_img(filepath, target_size=target_size)
+        image = img_to_array(image)
+        image = np.expand_dims(image, axis=0)
+        image = imagenet_utils.preprocess_input(image)
+
+        # use the network to make predictions on the input image and find
+        # the class label index with the largest corresponding probability
+        preds = model.predict(image)
+
+        # print('Preds', preds)
+
+        # print("preds", preds)
+        i = np.argmax(preds[0])
+        # decode the ImageNet predictions to obtain the human-readable label
+        # decoded = imagenet_utils.decode_predictions(preds)
+        # (imagenetID, label, prob) = decoded[0][0]
+        # label = "{}: {:.2f}%".format(label, prob * 100)
+        # print("[INFO] {}".format(label))
+        label = filename
+
+        # initialize our gradient class activation map and build the heatmap
+        cam = GradCAM(model, i)
+        heatmap = cam.compute_heatmap(image)
+
+        # print('heatmap')
+        # print(heatmap)
+
+        # resize the resulting heatmap to the original input image dimensions
+        # and then overlay heatmap on top of the imageprint('heatmap')
+        # print(heatmap)rig, alpha=0.5)
+        heatmap = cv2.resize(heatmap, (orig.shape[1], orig.shape[0]))
+        (heatmap, output) = cam.overlay_heatmap(heatmap, orig, alpha=0.5)
+
+        # draw the predicted label on the output image
+        cv2.rectangle(output, (0, 0), (340, 40), (0, 0, 0), -1)
+        cv2.putText(output, label, (10, 25), cv2.FONT_HERSHEY_SIMPLEX,
+                    0.8, (255, 255, 255), 2)
+        # display the original image and resulting heatmap and output image
+        # to our screen
+        output = np.vstack([orig, heatmap, output])
+        output = imutils.resize(output, height=700)
+        # cv2.imshow("Output", output)
+
+        out_file = f"{output_folder}/{filename}"
+
+        cv2.imwrite(out_file, output)
+        # cv2.waitKey(0)
+
+
+# model_filename = 'cidia-lung-model_1.h5'
+# model_filename = 'local-modelhaha.h5'
+# slice_filename = '/home/chicobentojr/Desktop/cidia/data/C11/-slice260..png'
+
+# model_filename = '/home/chicobentojr/Desktop/cidia/model/test_chico/fold1/my_checkpoint/'
+# slice_filename = '/home/chicobentojr/Desktop/cidia/model/test_chico/TYP-009/axis1/3D_View1.png'
+
+# slice_filename = '/home/chicobentojr/Desktop/cidia/data/C11/-slice260..png'
+# model_filename = '/home/chicobentojr/Desktop/cidia/model/model_1'
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('input_files', metavar='INPUT_FILES', nargs='+')
+    parser.add_argument('output_folder', metavar='OUTPUT_FOLDER')
+    parser.add_argument('-m', '--model', metavar='model')
+    parser.add_argument(
+        '--linear', dest='linear_activation', action='store_true')
+    parser.add_argument('-s', '--size', dest='size', type=int)
+    parser.add_argument('--debug', dest='debug', action='store_true')
+    parser.add_argument('--with-raw', dest='with_raw', action='store_true')
+    parser.add_argument('--preds', dest='preds', action='store_true')
+    parser.add_argument('--verbose', dest='verbose', action='store_true')
+
+    parser.set_defaults(debug=False, with_raw=False, linear_activation=False,
+                        plot='confusion-matrix', verbose=False, size=300,
+                        fixed_prefix='results/MobileNet/')
+
+    args = parser.parse_args()
+
+    print('Input')
+    print(json.dumps(args.__dict__, indent=2))
     print()
 
-    sss = 512
-
-    # load the original image from disk (in OpenCV format) and then
-    # resize the image to its target dimensions
-    orig = cv2.imread(args["image"])
-    resized = cv2.resize(orig, (sss, sss))
-    # load the input image from disk (in Keras/TensorFlow format) and
-    # preprocess it
-    image = load_img(args["image"], target_size=(sss, sss))
-    image = img_to_array(image)
-    image = np.expand_dims(image, axis=0)
-    image = imagenet_utils.preprocess_input(image)
-
-    # use the network to make predictions on the input image and find
-    # the class label index with the largest corresponding probability
-    preds = model.predict(image)
-
-    print('Preds', preds)
-
-    # print("preds", preds)
-    i = np.argmax(preds[0])
-    # decode the ImageNet predictions to obtain the human-readable label
-    # decoded = imagenet_utils.decode_predictions(preds)
-    # (imagenetID, label, prob) = decoded[0][0]
-    # label = "{}: {:.2f}%".format(label, prob * 100)
-    # print("[INFO] {}".format(label))
-    label = "blach"
-
-    # initialize our gradient class activation map and build the heatmap
-    cam = GradCAM(model, i)
-    heatmap = cam.compute_heatmap(image)
-    # resize the resulting heatmap to the original input image dimensions
-    # and then overlay heatmap on top of the image
-    heatmap = cv2.resize(heatmap, (orig.shape[1], orig.shape[0]))
-    (heatmap, output) = cam.overlay_heatmap(heatmap, orig, alpha=0.5)
-
-    # draw the predicted label on the output image
-    cv2.rectangle(output, (0, 0), (340, 40), (0, 0, 0), -1)
-    cv2.putText(output, label, (10, 25), cv2.FONT_HERSHEY_SIMPLEX,
-                0.8, (255, 255, 255), 2)
-    # display the original image and resulting heatmap and output image
-    # to our screen
-    output = np.vstack([orig, heatmap, output])
-    output = imutils.resize(output, height=700)
-    # cv2.imshow("Output", output)
-    cv2.imwrite("output.png", output)
-    # cv2.waitKey(0)
+    start = time.ctime()
+    main(args)
+    print('Process started at ', start)
+    print('Process finished at ', time.ctime())
