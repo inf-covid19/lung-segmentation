@@ -64,12 +64,15 @@ height = 512
 
 # model_filename = '/home/chicobentojr/Desktop/cidia/model/binary_model'
 # model_filename = '/home/chicobentojr/Desktop/cidia/model/ternary_model'
-# model_filename = '/home/chicobentojr/Desktop/cidia/model/model_1'
+model_filename = '/home/chicobentojr/Desktop/cidia/model/model_1'
 # model_filename = '/home/chicobentojr/Desktop/cidia/model/balanced_weights'
-model_filename = 'cidia-lung-model_1.h5'
+# model_filename = 'cidia-lung-model_1.h5'
 # slice_filename = '/home/chicobentojr/Desktop/cidia/data/C143/-slice255..png'
 slice_filename = '/home/chicobentojr/Desktop/cidia/data/C11/-slice260..png'
 # slice_filename = '/home/chicobentojr/Desktop/cidia/data/C33/-slice276..png'
+
+# model_filename = '/home/chicobentojr/Desktop/cidia/model/test_chico/fold1/my_checkpoint/'
+# slice_filename = '/home/chicobentojr/Desktop/cidia/model/test_chico/TYP-009/axis1/3D_View1.png'
 
 # model_filename = '/home/chicobentojr/Workspace/UFRGS/image-classifier/keras/scripts/models/cat-dog.model'
 # slice_filename = '/home/chicobentojr/Workspace/UFRGS/image-classifier/keras/scripts/images/example/cat/cat.jpg'
@@ -181,7 +184,6 @@ def get_model():
 
     return model
 
-
     # model.compile(optimizer=optimizers.RMSprop(lr=2e-5),
     #               loss='binary_crossentropy', metrics=['accuracy'])
     # return model
@@ -191,6 +193,8 @@ model = load_model(model_filename)
 print('model summary')
 model.summary()
 print()
+
+model.layers[-1].activation = tf.keras.activations.linear
 
 # plot_model(load_model(model_filename),
 #            to_file='model-topology.png', show_shapes=True)
@@ -350,7 +354,6 @@ classifier_layer_names = [
     "dropout",
     "dense_1",
     "dropout_1",
-    # "dropout_2",
     "dense_2",
 
 
@@ -363,6 +366,11 @@ classifier_layer_names = [
     # "dense_3",
     # "dropout_3",
     # "dense_4",
+
+
+    # Maritza 3D model axis 1
+    # "global_average_pooling2d",
+    # "dense",
 ]
 
 # Generate class activation heatmap
