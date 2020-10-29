@@ -8,8 +8,8 @@ import pandas as pd
 
 
 EXAM_FOLDERS = [
-    '/home/chicobentojr/Desktop/cidia-files/exams/C11',
-    '/home/chicobentojr/Desktop/cidia-files/exams'
+    '/home/chicobentojr/Desktop/cidia-files/exams',
+    '/home/chicobentojr/Desktop/cidia-files/exams/C11'
 ]
 VIDEO_URL_PREFIX = '/assets/exam-data/preview-video/'
 VIDEO_FOLDERS = [
@@ -43,6 +43,10 @@ RESULT_COLUMNS = {
     # "Erros 2 e 3": 1.0
 }
 
+EXAM_NAME_MAP = {
+    "EXAME11": "C11"
+}
+
 
 output_folder = 'exam-data'
 os.makedirs(output_folder, exist_ok=True)
@@ -69,6 +73,9 @@ for fold in exam_folders:
             study_uid = dataset.get('StudyInstanceUID', 'not-found')
             patient_id = dataset.get('PatientID', 'not-found')
 
+            if patient_id in EXAM_NAME_MAP:
+                patient_id = EXAM_NAME_MAP[patient_id]
+
             result_dict[study_uid] = {
                 'patientID': patient_id,
             }
@@ -90,7 +97,9 @@ for key, patient in result_dict.items():
 
     columns = row_df.columns.tolist()
 
-    labels = {}
+    labels = {
+        'name': patient_id
+    }
 
     for i, r in row_df.iterrows():
         for col, name in RESULT_COLUMNS.items():
@@ -109,7 +118,8 @@ for key, patient in result_dict.items():
 
     for video_folder in VIDEO_FOLDERS:
         for root, dirnames, filenames in os.walk(video_folder):
-            video_url = next((f for f in filenames if patient_id in f), None)
+            video_url = next(
+                (f for f in filenames if f"{patient_id}.mp4" in f), None)
 
             if video_url:
                 print(f"Video found: {video_url}")
@@ -131,7 +141,8 @@ for key, patient in result_dict.items():
 
     for video_folder in SLICES_FOLDERS:
         for root, dirnames, filenames in os.walk(video_folder):
-            important_slices = [f for f in filenames if patient_id in root]
+            important_slices = [
+                f for f in filenames if patient_id == root.split('/')[-1]]
 
             if important_slices:
                 print(f"Slices found to {patient_id}: {important_slices}")
