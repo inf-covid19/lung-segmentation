@@ -4,6 +4,7 @@ import pydicom
 import shutil
 import re
 import json
+import pandas as pd
 
 
 EXAM_FOLDERS = [
@@ -18,6 +19,29 @@ SLICES_FOLDERS = [
     '/home/chicobentojr/Desktop/cidia-files/important-slices',
 ]
 SLICE_PREFIX = '/assets/exam-data/important-slices/'
+
+RESULT_CSV_FILE = 'fapergs.csv'
+RESULT_COLUMNS = {
+    "Radiology ": "Radiology",
+    "2: Slices 2D": "Slices 2D",
+    "3: VR": "Volume Rendering",
+    "AVG 2 e 3": "Average",
+    # "Fold number": 2,
+    # "Patient ID": "C114",
+    # "Img. esf\u00e9ricas": "2,79%",
+    # "Slices 2D": "40,00%",
+    # "Vistas 3D (Eixos 1-2-4)": "10,16%",
+    # "Fold": 2,
+    # "Patient ID.1": "C114",
+    # "Radiology .1": "typical",
+    # "AVG ALL": NaN,
+    # "1: Spherical": NaN,
+    # "AVG 1 e 2": NaN,
+    # "AVG 1 e 3": NaN,
+    # "Erros 2": 1.0,
+    # "Erros 3": 1.0,
+    # "Erros 2 e 3": 1.0
+}
 
 
 output_folder = 'exam-data'
@@ -48,6 +72,32 @@ for fold in exam_folders:
             result_dict[study_uid] = {
                 'patientID': patient_id,
             }
+
+print()
+print('Retrieving models results')
+print()
+
+result_df = pd.read_csv(RESULT_CSV_FILE)
+
+for key, patient in result_dict.items():
+
+    patient_id = patient['patientID']
+
+    row_df = result_df[result_df['Patient ID'] == patient_id]
+
+    if row_df.empty:
+        continue
+
+    columns = row_df.columns.tolist()
+
+    labels = {}
+
+    for i, r in row_df.iterrows():
+        for col, name in RESULT_COLUMNS.items():
+            if r[col]:
+                labels[name] = r[col]
+
+    patient['labels'] = labels
 
 print()
 print('Retrieving video URL')
@@ -99,6 +149,6 @@ for key, patient in result_dict.items():
                 patient['importantSlices'] = important_slices
 print()
 
-result_json = json.dumps(result_dict, indent=2)
+result_json = json.dumps(result_dict, indent=2, ensure_ascii=False)
 with open("cidia-studies.json", "w") as f:
     f.write(result_json)
