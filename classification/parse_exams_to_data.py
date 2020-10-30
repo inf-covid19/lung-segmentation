@@ -10,19 +10,29 @@ import pandas as pd
 EXAM_FOLDERS = [
     '/ssd/share/CT-Original/DICOM-HCPA/exame-pulmao',
     '/ssd/share/CT-Original/DICOM-HMV/exame-pulmao',
-    '/home/users/chicobentojr/workspace/HCPA-organizado-parte-2',
+    '/home/users/chicobentojr/workspace/HCPA-organizado-parte-2'
+    # '/home/chicobentojr/Desktop/cidia-files/exams'
 
 ]
 VIDEO_URL_PREFIX = '/assets/exam-data/preview-video/'
 VIDEO_FOLDERS = [
     '/ssd/share/CT-Segmentado/03-P-HNN/MP4-HMV-HCPA',
+    # '/home/chicobentojr/Desktop/cidia-files/MP4-HMV-HCPA'
 ]
 SLICES_FOLDERS = [
     '/ssd/share/CT-Segmentado/03-P-HNN/NII-HCPA/exame-pulmao/',
     '/ssd/share/CT-Segmentado/03-P-HNN/NII-HMV/exame-pulmao/',
     '/ssd/share/CT-Segmentado/03-P-HNN/NII-HCPA-parte-2/exame-pulmao/',
+    # '/home/chicobentojr/Desktop/cidia-files/important-slices'
 ]
 SLICE_PREFIX = '/assets/exam-data/important-slices/'
+
+STATISTICS_FILES = [
+    '/ssd/share/CT-Segmentado/03-P-HNN/statistics/hmv_statistics_all.csv',
+    '/ssd/share/CT-Segmentado/03-P-HNN/statistics/hcpa_statistics_all.csv',
+    # 'statistics/hcpa_statistics_all.csv',
+    # 'statistics/hmv_statistics_all.csv',
+]
 
 RESULT_CSV_FILE = 'fapergs3.csv'
 RESULT_COLUMNS = {
@@ -34,6 +44,13 @@ RESULT_COLUMNS = {
     "AVG 2 e 3": "Average 2-3",
     "AVG 1 e 2": "Average 1-2",
     "AVG 1 e 3": "Average 1-3",
+    "% total ggo": "% Total GGO",
+    "% right lung ggo": "% Right Lung GGO",
+    "% left lung ggo": "% Left Lung GGO",
+    "# lesions": "# Lesions",
+    "# lesions right lung": "# Lesions Right Lung",
+    "# lesions left lung": "# Lesions Left Lung",
+
     # "Fold number": 2,
     # "Patient ID": "C114",
     # "Img. esf\u00e9ricas": "2,79%",
@@ -105,6 +122,9 @@ for fold in exam_folders:
 
             result_dict[study_uid] = {
                 'patientID': patient_id,
+                'labels': {
+                    'Name': patient_id,
+                }
             }
 
 print()
@@ -124,16 +144,46 @@ for key, patient in result_dict.items():
 
     columns = row_df.columns.tolist()
 
-    labels = {
-        'name': patient_id
-    }
+    labels = patient['labels']
 
     for i, r in row_df.iterrows():
         for col, name in RESULT_COLUMNS.items():
-            if r[col]:
+            if col in r and r[col]:
                 labels[name] = r[col]
 
     patient['labels'] = labels
+
+print()
+print('Retrieving models statististics')
+print()
+
+for stat_file in STATISTICS_FILES:
+    result_df = pd.read_csv(stat_file, sep=';')
+
+    for key, patient in result_dict.items():
+
+        patient_id = patient['patientID']
+
+        row_df = result_df[result_df['pacient'] == patient_id]
+
+        if row_df.empty:
+            continue
+
+        columns = row_df.columns.tolist()
+
+        labels = patient['labels']
+
+        for i, r in row_df.iterrows():
+            for col, name in RESULT_COLUMNS.items():
+                if col in r and r[col]:
+                    v = r[col]
+
+                    if type(v) is float:
+                        labels[name] = f"{v:.4f}"
+                    else:
+                        labels[name] = v
+
+        patient['labels'] = labels
 
 print()
 print('Retrieving video URL')
