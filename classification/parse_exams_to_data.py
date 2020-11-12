@@ -29,7 +29,8 @@ SLICE_PREFIX = '/assets/exam-data/important-slices/'
 
 STATISTICS_FILES = [
     '/ssd/share/CT-Segmentado/03-P-HNN/statistics/hmv_statistics_all.csv',
-    '/ssd/share/CT-Segmentado/03-P-HNN/statistics/hcpa_statistics_all.csv',
+    'hcpa_statistics_all.csv',
+    # '/ssd/share/CT-Segmentado/03-P-HNN/statistics/hcpa_statistics_all.csv',
     # 'statistics/hcpa_statistics_all.csv',
     # 'statistics/hmv_statistics_all.csv',
 ]
@@ -37,7 +38,7 @@ STATISTICS_FILES = [
 RESULT_CSV_FILE = 'fapergs3.csv'
 RESULT_COLUMNS = {
     "Radiology ": "Radiology",
-    "AVG ALL": "Avegare All",
+    "AVG ALL": "Average All",
     "1: Spherical": "Spherical",
     "2: Slices 2D": "Slices 2D",
     "3: VR": "Volume Rendering",
@@ -115,15 +116,15 @@ for fold in exam_folders:
             dataset = pydicom.dcmread(slice_file)
 
             study_uid = dataset.get('StudyInstanceUID', 'not-found')
-            patient_id = dataset.get('PatientID', 'not-found')
+            patient_name = str(dataset.get('PatientName', 'not-found'))
 
-            if patient_id in EXAM_NAME_MAP:
-                patient_id = EXAM_NAME_MAP[patient_id]
+            if patient_name in EXAM_NAME_MAP:
+                patient_name = EXAM_NAME_MAP[patient_name]
 
             result_dict[study_uid] = {
-                'patientID': patient_id,
+                'patientName': patient_name,
                 'labels': {
-                    'Name': patient_id,
+                    'Name': patient_name,
                 }
             }
 
@@ -135,9 +136,9 @@ result_df = pd.read_csv(RESULT_CSV_FILE)
 
 for key, patient in result_dict.items():
 
-    patient_id = patient['patientID']
+    patient_name = patient['patientName']
 
-    row_df = result_df[result_df['Patient ID'] == patient_id]
+    row_df = result_df[result_df['Patient ID'] == patient_name]
 
     if row_df.empty:
         continue
@@ -162,9 +163,9 @@ for stat_file in STATISTICS_FILES:
 
     for key, patient in result_dict.items():
 
-        patient_id = patient['patientID']
+        patient_name = patient['patientName']
 
-        row_df = result_df[result_df['pacient'] == patient_id]
+        row_df = result_df[result_df['pacient'] == patient_name]
 
         if row_df.empty:
             continue
@@ -191,12 +192,12 @@ print()
 
 for key, patient in result_dict.items():
 
-    patient_id = patient['patientID']
+    patient_name = patient['patientName']
 
     for video_folder in VIDEO_FOLDERS:
         for root, dirnames, filenames in os.walk(video_folder):
             video_url = next(
-                (f for f in filenames if f"{patient_id}.mp4" in f), None)
+                (f for f in filenames if f"{patient_name}.mp4" in f), None)
 
             if video_url:
                 print(f"Video found: {video_url}")
@@ -214,28 +215,28 @@ print()
 
 for key, patient in result_dict.items():
 
-    patient_id = patient['patientID']
+    patient_name = patient['patientName']
 
     for slice_folder in SLICES_FOLDERS:
         for root, dirnames, filenames in os.walk(slice_folder):
             important_slices = [
                 f for f in filenames
-                if (patient_id == root.split('/')[-1] or patient_id == root.split('/')[-2])
+                if (patient_name == root.split('/')[-1] or patient_name == root.split('/')[-2])
                 and ".png" in f]
 
             if important_slices:
-                print(f"Slices found to {patient_id}: {important_slices}")
+                print(f"Slices found to {patient_name}: {important_slices}")
 
                 slice_new_folder = f"{output_folder}/important-slices"
                 os.makedirs(slice_new_folder, exist_ok=True)
 
                 for slc in important_slices:
-                    pat_slc_folder = f"{slice_new_folder}/{patient_id}"
+                    pat_slc_folder = f"{slice_new_folder}/{patient_name}"
                     os.makedirs(pat_slc_folder, exist_ok=True)
                     shutil.copy(f"{root}/{slc}", f"{pat_slc_folder}/{slc}")
 
                 important_slices = [
-                    f"{SLICE_PREFIX}{patient_id}/{x}" for x in important_slices]
+                    f"{SLICE_PREFIX}{patient_name}/{x}" for x in important_slices]
                 patient['importantSlices'] = important_slices
 print()
 
