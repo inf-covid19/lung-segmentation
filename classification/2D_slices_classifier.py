@@ -7,6 +7,11 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix
 
 
+CSV_FILE = 'predicted_by_image_axis2.csv'
+
+LABELS = ['covid', 'non covid']
+
+
 def get_cm_metrics(confusion_matrix, labels, verbose=False):
     n = len(labels)
     cm_total = confusion_matrix.sum()
@@ -172,11 +177,6 @@ def plot_confusion_matrix(cm,
         plt.show()
 
 
-CSV_FILE = 'all_preds_raw.csv'
-
-LABELS = ['covid', 'others']
-
-
 def main():
 
     df = pd.read_csv(CSV_FILE, index_col=0)
@@ -185,7 +185,7 @@ def main():
     print(df)
     print()
 
-    values = df.iloc[:100].values
+    values = df.iloc[:-1].values
     X = []
 
     for r in values:
@@ -237,17 +237,7 @@ def main():
         y_test = Y[test_idx]
         y_test = np.array([np.argmax(y) for y in y_test])
 
-        # print('t idx', test_idx)
-        # print('t idx 0', test_idx[0])
-
-        # print('x 0', X[test_idx[0]])
-        # print('y 0', Y[test_idx[0]])
-
-        # print('X', x_train.shape)
-        # print(x_train[0])
-        # print('Y', y_train.shape)
-        # break
-
+        # TODO: Add different models
         model = LogisticRegression(max_iter=1000).fit(x_train, y_train)
 
         y_pred = model.predict(x_test)
@@ -261,6 +251,7 @@ def main():
         training_acc = model.score(x_train, y_train)
         test_acc = model.score(x_test, y_test)
 
+        # TODO: Show more metrics: f1-score, kappa
         print('training acc', training_acc)
         print('test acc', test_acc)
         print()
@@ -271,9 +262,17 @@ def main():
     print('final matrix')
     print(final_matrix)
 
-    plot_confusion_matrix(final_matrix, LABELS, output_file='final_matrix.png',
+    cm_filename = f"{CSV_FILE.replace('.csv', '')}-confusion-matrix.png"
+    cm_title = f"Confusion Matrix: {CSV_FILE}"
+
+    plot_confusion_matrix(final_matrix, LABELS, title=cm_title, output_file=cm_filename,
                           figsize=(6, 6))
 
 
 if __name__ == "__main__":
+    # TODO: Add arguments:
+    #       - input files
+    #       - output folder to png files
+    #       - verbose flag
+    #       - k to repeat k cross validations
     main()
