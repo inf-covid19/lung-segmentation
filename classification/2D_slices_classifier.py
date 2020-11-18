@@ -7,7 +7,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix
 
 
-CSV_FILE = 'predicted_by_image_axis2.csv'
+CSV_FILE = 'predicted_by_image_axis1.csv'
 
 LABELS = ['covid', 'non covid']
 
@@ -181,6 +181,10 @@ def main():
 
     df = pd.read_csv(CSV_FILE, index_col=0)
 
+    exams_labels = df.columns.tolist()
+
+    errors = []
+
     print("df")
     print(df)
     print()
@@ -258,7 +262,20 @@ def main():
 
         final_matrix += matrix
 
-    # final_matrix = final_matrix.astype(int)
+        print('test idx', test_idx)
+
+        # Loading errors
+        for i in range(len(y_test)):
+            if y_test[i] != y_pred[i]:
+                exam_label = exams_labels[test_idx[i]]
+                errors.append((exam_label, y_test[i], y_pred[i]))
+
+    print()
+    print("List of errors:")
+    for r in errors:
+        print(f"Exam: {r[0].ljust(10)} => true: {r[1]} | pred: {r[2]}")
+    print()
+
     print('final matrix')
     print(final_matrix)
 
