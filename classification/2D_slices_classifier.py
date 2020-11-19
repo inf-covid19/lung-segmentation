@@ -4,12 +4,14 @@ import random
 import matplotlib.pyplot as plt
 import itertools
 from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import confusion_matrix
 
 
-CSV_FILE = 'predicted_by_image_axis1.csv'
+CSV_FILE = 'all_preds_raw.csv'
 
-LABELS = ['covid', 'non covid']
+# LABELS = ['covid', 'non covid']
+LABELS = ['covid', 'others']
 
 
 def get_cm_metrics(confusion_matrix, labels, verbose=False):
@@ -242,7 +244,9 @@ def main():
         y_test = np.array([np.argmax(y) for y in y_test])
 
         # TODO: Add different models
-        model = LogisticRegression(max_iter=1000).fit(x_train, y_train)
+        # model = LogisticRegression(max_iter=1000).fit(x_train, y_train)
+
+        model = RandomForestClassifier().fit(x_train, y_train)
 
         y_pred = model.predict(x_test)
 
