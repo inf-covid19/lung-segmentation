@@ -9,11 +9,11 @@ from sklearn.metrics import confusion_matrix
 
 
 # CSV_FILE = 'predicted_by_image_axis2.csv'
-CSV_FILE = 'predicted_by_image_4.csv'
-# CSV_FILE = 'all_preds_raw.csv'
+# CSV_FILE = 'predicted_by_image_4.csv'
+CSV_FILE = 'all_preds_raw.csv'
 
-LABELS = ['covid', 'non covid']
-# LABELS = ['covid', 'others']
+# LABELS = ['covid', 'non covid']
+LABELS = ['covid', 'others']
 
 
 def get_cm_metrics(confusion_matrix, labels, verbose=False):
@@ -183,8 +183,8 @@ def plot_confusion_matrix(cm,
 
 def main():
 
-    df = pd.read_csv(CSV_FILE)
-    # df = pd.read_csv(CSV_FILE, index_col=0)
+    # df = pd.read_csv(CSV_FILE)
+    df = pd.read_csv(CSV_FILE, index_col=0)
 
     exams_labels = df.columns.tolist()
 
@@ -198,7 +198,7 @@ def main():
     X = []
 
     for r in values:
-        X.append([v.replace(',', '.') for v in r])
+        X.append([str(v).replace(',', '.') for v in r])
     X = np.array(X).astype(float)
     X = X.transpose()
     print('X', X.shape)
