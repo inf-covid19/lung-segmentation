@@ -8,10 +8,12 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import confusion_matrix
 
 
-CSV_FILE = 'all_preds_raw.csv'
+# CSV_FILE = 'predicted_by_image_axis2.csv'
+CSV_FILE = 'predicted_by_image_4.csv'
+# CSV_FILE = 'all_preds_raw.csv'
 
-# LABELS = ['covid', 'non covid']
-LABELS = ['covid', 'others']
+LABELS = ['covid', 'non covid']
+# LABELS = ['covid', 'others']
 
 
 def get_cm_metrics(confusion_matrix, labels, verbose=False):
@@ -181,7 +183,8 @@ def plot_confusion_matrix(cm,
 
 def main():
 
-    df = pd.read_csv(CSV_FILE, index_col=0)
+    df = pd.read_csv(CSV_FILE)
+    # df = pd.read_csv(CSV_FILE, index_col=0)
 
     exams_labels = df.columns.tolist()
 
@@ -244,9 +247,8 @@ def main():
         y_test = np.array([np.argmax(y) for y in y_test])
 
         # TODO: Add different models
-        # model = LogisticRegression(max_iter=1000).fit(x_train, y_train)
-
-        model = RandomForestClassifier().fit(x_train, y_train)
+        model = LogisticRegression(max_iter=1000).fit(x_train, y_train)
+        # model = RandomForestClassifier().fit(x_train, y_train)
 
         y_pred = model.predict(x_test)
 
