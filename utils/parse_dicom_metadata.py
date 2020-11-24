@@ -55,4 +55,6 @@ with open(OUTPUT_FILE, "w") as f:
 
 df = pd.DataFrame(result_dict).T
 
-df.to_csv(OUTPUT_FILE.replace('.json', '.csv'), index=False)
+df.index.rename('Exam', inplace=True)
+
+df.to_csv(OUTPUT_FILE.replace('.json', '.csv'))
